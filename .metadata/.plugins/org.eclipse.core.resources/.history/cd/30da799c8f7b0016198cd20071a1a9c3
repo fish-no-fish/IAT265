@@ -1,0 +1,11 @@
+
+
+public class Bear 
+{
+	private int xPos;
+	private int yPos;
+	private int scale = 2;
+	private int bearW;
+	private int bearH;
+	
+}
