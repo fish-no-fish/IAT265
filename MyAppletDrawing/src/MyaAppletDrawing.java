@@ -24,6 +24,9 @@ public class MyaAppletDrawing extends Applet {
 		g.setColor(Color.black);
 		g.drawOval(x,y,d,d);
 		
+//		drawing a hat
+		g.fillRoundRect(x+(d*1/10)/2, y, d*9/10, d/5, 100, 100);
+		
 //		g.fillOval(x+d/3-(ed/2), y+d/3-(ed/2), ed, ed);
 //		g.fillOval(x + (2*(d/3))-(ed/2), y+d/3-(ed/2), ed, ed);
 		
