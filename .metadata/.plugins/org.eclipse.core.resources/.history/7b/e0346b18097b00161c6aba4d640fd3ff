@@ -1,0 +1,13 @@
+import java.applet.Applet;
+import java.awt.*;
+
+public class MyaAppletDrawing extends Applet {
+	
+	Color faceColor = yellow;
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

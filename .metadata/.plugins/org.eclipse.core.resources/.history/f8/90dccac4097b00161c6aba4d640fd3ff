@@ -1,0 +1,32 @@
+import java.applet.Applet;
+import java.awt.*;
+
+public class MyaAppletDrawing extends Applet {
+	
+	Color faceColor;
+	
+	public void init()
+	{
+		faceColor = Color.yellow;
+	}
+	
+	public void paint(Graphics g)
+	{
+		Dimension size = getSize();
+		int d = Math.min(size.width, size.height);
+		int ed = d/20;
+		int x = (size.width-d)/2;
+		int y = (size.height -d)/2;
+		
+		g.setColor(faceColor);
+		g.fillOval(x,y,d,d);
+		g.setColor(Color.black);
+		g.drawOval(x,y,d,d);
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}
