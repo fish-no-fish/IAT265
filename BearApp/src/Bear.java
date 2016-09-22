@@ -24,6 +24,12 @@ public class Bear {
 			xPos = BearPanel.WIN_WIDTH / 2;
 			yPos = BearPanel.WIN_HEIGHT / 2;
 		}
+		
+		public Bear(int posX, int posY)
+		{
+			xPos = posX;
+			yPos = posY;
+		}
 
 		public void drawBear(Graphics g) {
 			// legs
