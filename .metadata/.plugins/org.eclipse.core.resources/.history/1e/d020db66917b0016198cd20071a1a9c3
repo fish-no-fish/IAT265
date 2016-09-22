@@ -1,0 +1,38 @@
+import java.awt.Color;
+import java.awt.*;
+
+public class Bear 
+{
+	private static final int WIN_WIDTH = 600;
+	private static final int WIN_HEIGHT = 600;	
+	
+	private int xPos;
+	private int yPos;
+	private int scale = 2;
+	private int bearW = scale * 30;
+	private int bearH = scale * 70;
+	
+	private Color bearColor = Color.red;
+	private Color outlineColor = Color.black;
+	
+	public Bear()
+	{
+		xPos = WIN_WIDTH/2;
+		yPos = WIN_HEIGHT/2;
+	}
+	
+	public void drawBear(Graphics g)
+	{
+//		body
+		g.setColor(bearColor);
+		g.fillOval(xPos-scale*20, yPos-scale*40, scale*40, scale*80);
+		g.setColor(outlineColor);
+		g.drawOval(xPos-scale*20, yPos-scale*40, scale*40, scale*80);
+	}
+	
+//	setter
+	public void setBearColor(Color c)
+	{
+		bearColor = c;
+	}
+}

@@ -1,0 +1,30 @@
+import java.awt.Color;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.JPanel;
+
+public class BearPanel extends JPanel implements MouseListener
+{
+	private Bear bear;
+	
+	public BearPanel()
+	{
+//		call JPanel's default constructor
+		super();
+		
+		bear = new Bear();
+		
+//		set panel size
+		this.setPreferredSize(new Dimension(600, 600));
+		this.setBackground(Color.white);
+	}
+	
+//	semi call back
+	public void paintComponent(Graphics g)
+	{
+//		call JPanel's paintComponent
+		super.paintComponent(g);
+		
+		bear.drawBear(g);
+	}
+}

@@ -1,0 +1,21 @@
+import javax.swing.JFrame;
+
+public class BearApp extends JFrame{
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		new BearApp("Bear");
+	}
+	
+//	overloading default constructor
+	public BearApp(String title)
+	{
+//		call JFrame's constructor
+		super(title);
+		BearPanel bpnl = new BearPanel();
+		
+//		add the panel to the current JFrame
+		this.add(bpnl);
+	}
+
+}

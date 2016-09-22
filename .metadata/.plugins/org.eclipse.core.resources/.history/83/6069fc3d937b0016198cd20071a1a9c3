@@ -1,0 +1,5 @@
+import javax.swing.Jpanel;
+
+public class BearPanel extends JPanel {
+
+}
