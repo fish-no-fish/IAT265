@@ -1,0 +1,19 @@
+import javax.swing.*;
+
+public class FishAppClass extends JFrame {
+
+	public FishAppClass(String title)
+	{
+		super(title);
+		this.setDefaultCloseOperation(JFame.EXIT_ON_CLOSE);
+		
+		FishPanel fishPanel = new FishPanel();
+		this.add(fishPanel);
+		this.pack();
+	}
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+	}
+
+}

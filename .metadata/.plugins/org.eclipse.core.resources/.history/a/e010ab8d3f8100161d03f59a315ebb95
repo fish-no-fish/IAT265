@@ -1,0 +1,8 @@
+import java.awt.*;
+
+public class Fish 
+{
+	private int posX, posY;
+	private int objWidth, objHeight;
+	private int speed, scale;
+}

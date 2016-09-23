@@ -1,0 +1,23 @@
+import java.awt.*;
+
+public class Fish 
+{
+	private int posX, posY;
+	private int myWidth, myHeight;
+	private int speed, scale;
+	
+	public Fish(int x, int y, int w, int h)
+	{
+		posX = x;
+		posY = y;
+		myWidth = w;
+		myHeight = h;
+	}
+	
+	public void drawFish(Graphics g)
+	{
+		g.setColor(Color.black);
+		
+		g.fillOval(posX, posY, myWidth, myHeight);
+	}
+}

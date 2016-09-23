@@ -1,0 +1,12 @@
+import java.awt.*;
+
+public class FishPanel extends JPanel
+{
+	private Fish fish;
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

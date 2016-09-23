@@ -1,0 +1,26 @@
+import java.awt.*;
+import javax.swing.*;
+
+public class FishPanel extends JPanel
+{
+	public final static int WIN_H = 600;
+	public final static int WIN_W = 800;
+	
+	private Fish fish;
+	
+	public FishPanel()
+	{
+		super();
+		this.setPreferredSize(new Dimension(WIN_W,WIN_H));
+//		TODO awaiting constructor
+		fish = new Fish(0,0,500,500);
+		fishPanel.setBackground(Color.green);
+	}
+	
+	public void paintComponent(Graphics2D g)
+	{
+		System.out.println("reached");
+		super.paintComponent(g);
+		fish.drawFish(g);
+	}
+}

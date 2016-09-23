@@ -1,0 +1,12 @@
+package pac;
+
+import java.awt.*;
+
+public class pacman 
+{
+	private int pacX, pacY;
+	private int bodyW, bodyH;
+	private int speedX;
+	
+	
+}
