@@ -1,6 +1,0 @@
-import java.awt.*;
-
-public class Fish 
-{
-	private Vector position = new Vector(x, y);
-}

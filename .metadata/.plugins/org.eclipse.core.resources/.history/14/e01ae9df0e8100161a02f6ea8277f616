@@ -1,7 +1,0 @@
-package pac;
-
-import java.awt.*;
-
-public class pacman {
-
-}

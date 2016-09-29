@@ -23,6 +23,8 @@ public class pacmanPanel extends JPanel implements ActionListener, MouseListener
 		timer = new Timer(30, this);
 		timer.start();
 		pac = new pacman(GARDEN_X + GARDEN_W/2, GARDEN_Y+GARDEN_H/2, 50, 50, 2, 1);	
+		
+		addMouseListener(this);
 	}
 	
 	public void paintComponent(Graphics g)
@@ -62,7 +64,7 @@ public class pacmanPanel extends JPanel implements ActionListener, MouseListener
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
-		System.out.println("it be workin \n");		
+//		System.out.println("it be workin \n");		
 	}
 
 	@Override
@@ -81,7 +83,8 @@ public class pacmanPanel extends JPanel implements ActionListener, MouseListener
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
 		pac.setScale(5);
-		System.out.println("it be workin \n");
+		pac.eyes = true;
+//		System.out.println("it be workin \n");
 		repaint();
 	}
 
@@ -89,6 +92,7 @@ public class pacmanPanel extends JPanel implements ActionListener, MouseListener
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
 		pac.setScale(1);
+		pac.eyes = false;
 		repaint();
 	}
 

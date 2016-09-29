@@ -26,7 +26,6 @@
 	</section>
 	<section name="PreferencesImportWizard">
 		<item value="C:\Users\Henry\Downloads\RainbowDrops.epf" key=""/>
-		<item value="C:\Users\Henry\Downloads\RainbowDrops.epf" key=""/>
 		<list key="WizardPreferencesExportPage1.STORE_DESTINATION_NAMES_ID">
 			<item value="C:\Users\Henry\Downloads\RainbowDrops.epf"/>
 			<item value="C:\Users\Henry\Downloads\RainbowDrops.txt"/>
@@ -46,9 +45,20 @@
 		<item value="6" key="DIALOG_Y_ORIGIN"/>
 	</section>
 	<section name="ImportExportAction">
+		<item value="org.eclipse.ui.wizards.export.ZipFile" key="ImportExportPage.STORE_SELECTED_EXPORT_WIZARD_ID"/>
 		<item value="org.eclipse.ui.wizards.import.Preferences" key="ImportExportPage.STORE_SELECTED_IMPORT_WIZARD_ID"/>
 		<list key="ImportExportPage.STORE_EXPANDED_IMPORT_CATEGORIES">
 			<item value="org.eclipse.ui.Basic"/>
+		</list>
+		<list key="ImportExportPage.STORE_EXPANDED_EXPORT_CATEGORIES">
+			<item value="org.eclipse.ui.Basic"/>
+		</list>
+	</section>
+	<section name="ZipFileExportWizard">
+		<item value="true" key="WizardZipFileResourceExportPage1.STORE_COMPRESS_CONTENTS_ID"/>
+		<item value="true" key="WizardZipFileResourceExportPage1.STORE_CREATE_STRUCTURE_ID"/>
+		<list key="WizardZipFileResourceExportPage1.STORE_DESTINATION_NAMES_ID">
+			<item value="C:\Users\Henry\workspace\101-Muhan-Zhao-Assignment1-301234939.zip"/>
 		</list>
 	</section>
 </section>

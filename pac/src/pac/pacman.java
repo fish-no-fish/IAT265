@@ -8,6 +8,7 @@ public class pacman
 	private int bodyW, bodyH;
 	private int speedX;
 	private int scale;
+	public boolean eyes = false;
 	
 	public pacman(int x, int y, int w, int h, int s, int _scale)
 	{
@@ -36,9 +37,24 @@ public class pacman
 			g2.scale(-1, 1);
 		}
 		
-		
 		g2.scale(scale, scale);
 		g2.fillArc(-bodyW/2, -bodyH/2, bodyW, bodyH, 30, 300);
+		if(eyes)
+		{
+			drawEyes(g2);			
+		}
+	}
+	
+	public void drawEyes(Graphics2D g3)
+	{
+		
+		g3.setColor(Color.black);
+		
+		g3.fillOval(-5, -15, 10, 10);
+		
+		g3.setColor(Color.yellow);
+		
+		
 	}
 	
 	public void setScale(int x)
