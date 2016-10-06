@@ -30,7 +30,7 @@ org.eclipse.jdt.ui.text.code_templates_migrated=true
 org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
 org.eclipse.jdt.ui.text.custom_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
 org.eclipse.jdt.ui.text.templates_migrated=true
-org.eclipse.jface.textfont=1|DejaVu Sans Mono|12.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|DejaVu Sans Mono;
+org.eclipse.jface.textfont=1|DejaVu Sans Mono|10.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|DejaVu Sans Mono;
 pf_coloring_argument=221,40,103
 pf_coloring_assignment=217,232,247
 pf_coloring_comment=98,98,98
