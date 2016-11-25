@@ -1,0 +1,8 @@
+package factory;
+
+import movingobjects.Bullet;
+
+public abstract class BulletFactory 
+{
+	abstract Bullet createBullet(String mod, int offset);
+}

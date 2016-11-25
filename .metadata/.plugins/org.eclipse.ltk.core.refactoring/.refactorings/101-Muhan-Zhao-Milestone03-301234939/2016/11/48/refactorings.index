@@ -1,0 +1,6 @@
+1479961346977	Rename type 'WarningTextConcreteCactory'
+1480021786381	Rename resource 'muzzleflashmachineside.png'
+1480029946103	Delete element
+1480061565983	Encapsulate field 'gunPumped'
+1480061657690	Encapsulate field 'chambered'
+1480062019450	Rename resource 'DPE-80021.png'

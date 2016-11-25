@@ -1,0 +1,15 @@
+1479453350013	Rename resource 'Ammo_STANAG_Mag.png'
+1479453407752	Delete element
+1479453440479	Rename resource 'Ammo_STANAG_Mag.png'
+1479454523887	Delete element
+1479489198438	Encapsulate field 'oldX'
+1479489205137	Encapsulate field 'oldY'
+1479489551158	Encapsulate field 'oldY'
+1479489555767	Encapsulate field 'oldX'
+1479525158689	Encapsulate field 'openSlot'
+1479525493360	Encapsulate field 'loaded'
+1479526293301	Rename method 'fired'
+1479528260653	Rename type 'GunM4Trigger'
+1479528932544	Rename field 'trigger'
+1479529608101	Encapsulate field 'held'
+1479530889963	Rename field 'isFiring'

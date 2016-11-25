@@ -1,0 +1,14 @@
+package factory;
+
+import movingobjects.Bullet;
+
+public class BulletConcreteFactory extends BulletFactory
+{
+
+	@Override
+	Bullet createBullet(String mod) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

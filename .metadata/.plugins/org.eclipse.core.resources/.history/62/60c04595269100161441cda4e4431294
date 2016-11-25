@@ -1,0 +1,177 @@
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.*;
+
+public class Fish 
+{
+	private double posx, posy, scalex, scaley;
+	private double myWidth, myHeight, speed;
+	
+	public Color hitboxColor;
+	
+	public Rectangle2D.Double hitbox;
+	
+	public Ellipse2D.Double body, eye, dot;
+	
+	private double offset;
+	
+	private int depth;
+	private int oscillation;
+	
+	public Fish(int x, int y, double scale, int speed_)
+	{
+		posx = x;
+		posy = y;
+		scalex = scale;
+		scaley = scale;
+		speed = speed_;
+
+		myWidth = 200 * scalex;
+		myHeight = 100 * scaley;
+		
+		offset = 25 * scalex;
+		
+		body = new Ellipse2D.Double();
+		eye = new Ellipse2D.Double();
+		dot = new Ellipse2D.Double();
+		hitbox = new Rectangle2D.Double();
+		
+		depth = 500;
+		oscillation = 50;
+		
+		hitboxColor = new Color(0,0,0,127);
+	}
+	
+	public boolean handleCollision(Fish target)
+	{
+		if (Math.abs(posx - target.posx) <= myWidth/2-50+offset + target.myWidth/2-50+target.offset && Math.abs(posy - target.posy) <= myHeight/2 + target.myHeight/2)
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public void changeDirection()
+	{
+		speed.x *= -1;
+		scalex *= -1;
+	}
+	
+	public void setMovement(int de, int os)
+	{
+		depth = de;
+		oscillation = os;
+	}
+	
+	public void setLocation(int x, int y)
+	{
+		posx = x;
+		posy = y;
+	}
+	
+	public void setSize(double x)
+	{
+		scalex = x;
+		scaley = x;
+	}
+	
+	private void setBodyAtt()
+	{
+//		body
+		body.setFrame(-myWidth/2+offset, -myHeight/2, myWidth, myHeight);
+//		eyes
+		eye.setFrame((myWidth/2*.6)-25/2+offset, -25/2, 25, 25);	
+		
+//		hitbox
+		hitbox.setFrame(-myWidth/2-50+offset, -myHeight/2, myWidth+50, myHeight);
+	}
+	
+	
+	
+	public void moveFish()
+	{
+		posx += speed.x;
+		posy = depth - oscillation * Math.sin(posx/50);
+		
+		if (detectBoundary())
+		{
+			changeDirection();
+		}
+	}
+	
+	private boolean detectBoundary()
+	{
+		if (posx+myWidth/2+25+10 >= FishPanel.WIN_W || posx-myWidth/2-25-10 <= 0)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	
+	public void drawFish(Graphics g)
+	{
+		Graphics2D g2 = (Graphics2D) g;
+		AffineTransform original = g2.getTransform();
+		g2.translate(posx, posy);
+		g2.scale(scalex, scaley);
+		
+		g2.setColor(Color.black);
+		
+//		fins upper
+		int[]fx1 = {-25+(int) offset,0+(int) offset,25+(int) offset};
+		int[]fy1 = {-45, -95, -45};
+		g2.fillPolygon(fx1, fy1, 3);
+
+//		fins lower left
+		AffineTransform old = g2.getTransform();
+		g2.rotate(Math.toRadians(25));
+		g2.translate(+10,0);
+		g2.scale(-1,-1);
+		g2.fillPolygon(fx1, fy1, 3);
+		g2.setTransform(old);
+		
+//		fins lower right
+		old = g2.getTransform();
+		g2.rotate(Math.toRadians(-25));
+		g2.translate(75, 15);
+		g2.scale(-1,-1);
+		g2.fillPolygon(fx1, fy1, 3);
+		g2.setTransform(old);
+		
+		
+//		tail
+		int[] tx = {-150+(int) offset, -50+(int) offset, -150+(int) offset};
+		int[] ty = {50,0,-50};
+		g2.fillPolygon(tx, ty, 3);
+		
+		setBodyAtt();
+		g2.setColor(Color.white);
+		g2.fill(body);
+		
+		g2.setColor(Color.cyan);
+		
+		for (double i = -myWidth/2+5+offset; i < myWidth/2-5+offset; i+= 10)
+		{
+			for (double j = -myHeight/2+5; j < myHeight/2-5; j+= 10)
+			{
+				if (body.contains(i,j))
+				{
+					g2.fillOval((int)i-2,(int)j-2,4,4);
+				}
+			}
+		}
+		
+		g2.setColor(Color.black);
+		g2.fill(eye);
+//		
+//		g2.setColor(hitboxColor);
+//		g2.fill(hitbox);		
+		
+//		g2.setColor(Color.red);
+//		g2.fillRect(0, -1080, 1, 1080);
+
+		g2.setTransform(original);
+	}
+}

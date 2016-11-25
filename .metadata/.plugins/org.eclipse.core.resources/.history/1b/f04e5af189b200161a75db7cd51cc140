@@ -1,0 +1,140 @@
+package movingobjects;
+
+import static java.lang.Math.abs;
+import static java.lang.Math.sqrt;
+
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+public class Magazine extends MovingObjects
+{
+
+	private final static int MAX_AMMO = 30;
+	private int numLoaded;
+	private Rectangle2D.Double openSlot;
+	private boolean loaded;
+	
+	private double oldY;
+	private boolean eject;
+	
+	public Magazine(double posx, double posy) {
+		super(posx, posy);
+		// TODO Auto-generated constructor stub
+		try {
+			avatar = ImageIO.read(getClass().getResourceAsStream("/graphics/m16magazine.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		width = 123*1;
+		height = 225*1;
+		
+		numLoaded = 0;
+		setOpenSlot(new Rectangle2D.Double());
+		setLoaded(false);
+		
+		eject = false;
+	}
+
+	@Override
+	public void draw(Graphics2D g2) {
+		// TODO Auto-generated method stub
+		oldC = g2.getComposite();
+		opacity = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, initialOpacity);
+		g2.setComposite(opacity);
+
+		getOpenSlot().setFrame(posx-width/4.5, posy-15-height/2, width/1.5, 30);
+//		g2.fill(getOpenSlot());
+		g2.drawImage(avatar, (int) (posx-width/2), (int) (posy-height/2), (int) width, (int) height, null);
+		if (eject)
+		{
+			fallDown();
+		}
+	}
+	
+//	SPECIAL DISTANCE FOR MAGAZINE CALCULATION. AIMING FOR THE TOP OF THE ENTRANCE
+	public double distMag(MovingObjects target)
+	{
+		return sqrt((abs(posx-target.posx)*abs(posx-target.posx))+
+				(abs((posy-(width/2*.9))-target.posy)*abs((posy-(width/2*.9))-target.posy)));
+	}
+	
+	public boolean reload()
+	{
+		if (numLoaded < MAX_AMMO)
+		{
+			numLoaded++;
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isEmpty()
+	{
+		if (numLoaded <= 0)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	public void useBullet()
+	{
+		if (!(isEmpty()))
+		{
+			numLoaded--;
+		}
+	}
+
+	/**
+	 * @return the openSlot
+	 */
+	public Rectangle2D.Double getOpenSlot() {
+		return openSlot;
+	}
+
+	/**
+	 * @param openSlot the openSlot to set
+	 */
+	public void setOpenSlot(Rectangle2D.Double openSlot) {
+		this.openSlot = openSlot;
+	}
+
+	/**
+	 * @return the loaded
+	 */
+	public boolean isLoaded() {
+		return loaded;
+	}
+
+	/**
+	 * @param loaded the loaded to set
+	 */
+	public void setLoaded(boolean loaded) {
+		this.loaded = loaded;
+	}
+	
+	public void fallDown()
+	{
+		if (posy != oldY + 200)
+		{
+			posy+=10;
+		}
+		else
+		{
+			eject = false;
+		}
+	}
+	
+	public void setEject()
+	{
+		oldY = posy;
+		eject = true;
+		loaded = false;
+		numLoaded = 0;
+	}
+}

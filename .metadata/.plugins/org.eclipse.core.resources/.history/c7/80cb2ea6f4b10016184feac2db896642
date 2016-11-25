@@ -1,0 +1,5 @@
+package factory;
+
+public class BulletConcreteFactory extends BulletFactory{
+
+}

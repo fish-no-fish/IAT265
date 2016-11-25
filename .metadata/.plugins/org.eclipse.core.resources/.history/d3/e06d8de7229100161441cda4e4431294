@@ -1,0 +1,196 @@
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.awt.*;
+import java.awt.geom.*;
+
+import javax.swing.JPanel;
+import javax.swing.Timer;
+
+public class FishPanel extends JPanel implements MouseListener, ActionListener 
+{
+	
+	public final static int WIN_H = 972;
+	public final static int WIN_W = 1728;
+	
+	public Fish[] fish = new Fish[10];
+	private Timer timer;
+	
+	private ArrayList<Ellipse2D.Double> rocksList;
+	
+	private	Rectangle2D.Double pond = new Rectangle2D.Double();
+	
+	private Ellipse2D.Double rock1 = new Ellipse2D.Double();
+	private Ellipse2D.Double rock2 = new Ellipse2D.Double();
+	private Ellipse2D.Double rock3 = new Ellipse2D.Double();
+	private Ellipse2D.Double rock4 = new Ellipse2D.Double();
+	private Ellipse2D.Double rock5 = new Ellipse2D.Double();
+	
+
+	CubicCurve2D.Double seaweed1 = new CubicCurve2D.Double();
+	CubicCurve2D.Double seaweed2 = new CubicCurve2D.Double();
+	CubicCurve2D.Double seaweed3 = new CubicCurve2D.Double();
+	
+	public FishPanel()
+	{
+		super();
+		timer = new Timer(60,this);
+		timer.start();
+		
+		this.setPreferredSize(new Dimension(WIN_W, WIN_H));
+		fish[0] = new Fish(WIN_W/2, WIN_H/2);
+		fish[1] = new Fish(WIN_W/2-300, WIN_H/2);
+		fish[1].hitboxColor = new Color(255,0,0,127);
+		this.setBackground(Color.white);
+		rocksList = new ArrayList<Ellipse2D.Double>();
+		
+		addMouseListener(this);
+		
+	}
+	
+	public void paintComponent(Graphics g)
+	{
+		Graphics2D g2 = (Graphics2D) g;
+		AffineTransform old = g2.getTransform();
+		super.paintComponent(g);
+		drawPond(g2);
+		for (int i = 0; i < fish.length; i++)
+		{
+			if (fish[i] != null)
+			{
+				fish[i].drawFish(g);				
+			}			
+		}
+		g2.setTransform(old);
+		drawRocks();
+		g2.setColor(Color.gray);
+		for (int i = 0; i < rocksList.size(); i++)
+		{
+			g2.fill(rocksList.get(i));
+		}		
+		drawSeaweeds(g2);
+		
+
+		Area test2 = new Area(fish[0].hitbox);
+	}
+	
+	public void drawSeaweeds(Graphics2D g2)
+	{
+		g2.setColor(Color.green);
+		Point test = new Point(WIN_W/2+500, WIN_H);
+		seaweed1.setCurve(test.x, test.y-20, test.x-100, test.y-100-20, test.x+100, test.y-200-20, test.x, test.y-300-20);
+		seaweed2.setCurve(test.x-50, test.y-20, test.x-100-50, test.y-50-20, test.x+100-50, test.y-150-20, test.x-50, test.y-250-20);
+		seaweed3.setCurve(test.x+50, test.y-20, test.x-100+50, test.y-100+50-20, test.x+100+50, test.y-200+100-20, test.x+50, test.y-300+150-20);
+		g2.setStroke(new BasicStroke(20, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
+		g2.draw(seaweed1);
+		g2.draw(seaweed2);
+		g2.draw(seaweed3);
+	}
+	
+	private void drawPond(Graphics2D g2)
+	{
+		
+		pond.setFrame(10, 300, WIN_W-20, WIN_H-310);
+		Color pondColor = Color.decode("#1FBED6");
+		g2.setColor(pondColor);
+		g2.fill(pond);		
+	}
+	
+	private void drawRocks()
+	{
+//		System.out.println("Here");
+		rock1.setFrame(132, 944-100, 50, 25);
+		rock2.setFrame(385, 947-100, 50, 25);
+		rock3.setFrame(694, 893-100, 50, 25);
+		rock4.setFrame(1035, 963-100, 50, 25);
+		rock5.setFrame(1620, 964-100, 50, 25);
+		rocksList.add(rock1);		
+		rocksList.add(rock2);
+		rocksList.add(rock3);
+		rocksList.add(rock4);
+		rocksList.add(rock5);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+		for (int i = 0; i < fish.length; i++)
+		{
+			if (fish[i] != null)
+			{
+				fish[i].moveFish();
+//				for (int j = 0; j < fish.length; j++)
+//				{
+//					if (fish[j] != null && fish[i] != fish[j])
+//					{
+//						fish[i].handleCollision(fish[j]);
+//					}
+//				}
+			}	
+
+			if (handleCollision())
+			{
+				fish[0].changeDirection();
+				fish[1].changeDirection();
+			}
+			repaint();
+		}
+	}
+	
+	public boolean handleCollision()
+	{
+	
+//		if(other.hitbox.contains(this.hitbox) && this.hitbox.contains(other.hitbox))
+//		{
+//			System.out.println("HIT MANG");
+//			return true;
+//		}
+		Area test = new Area(fish[0].hitbox);
+		test.intersect(new Area(fish[1].hitbox));
+		
+		
+		return !test.isEmpty();
+		
+//		return false;
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+//		System.out.println(e.getX());
+//		System.out.println(e.getY());
+//		System.out.println("\n");
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

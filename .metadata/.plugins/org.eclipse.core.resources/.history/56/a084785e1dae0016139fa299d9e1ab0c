@@ -1,0 +1,48 @@
+package movingobjects;
+
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+public class BulletCasing extends MovingObjects
+{
+	private double x, y;
+	public BulletCasing(double posx, double posy) {
+		super(posx, posy);
+		// TODO Auto-generated constructor stub
+		try {
+			avatar = ImageIO.read(getClass().getResourceAsStream("/graphics/casing.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		width = 50*0.4;
+		height = 200*0.4;
+		angle = Math.toRadians(-90);
+
+		x = -3;
+		y = -(x*x)+3*x;
+	}
+
+	@Override
+	public void draw(Graphics2D g2) {
+		// TODO Auto-generated method stub
+		AffineTransform old = g2.getTransform();
+		g2.translate(posx, posy);
+		g2.rotate(angle);
+		g2.drawImage(avatar, (int) -width/2, (int) -height/2, (int) width, (int) height, null);
+		g2.setTransform(old);
+	}
+	
+	public void update()
+	{
+		x+=0.5;
+		y = -(x*x)+3*x;
+		
+		posx += x;
+		posy -=y;
+	}
+
+}

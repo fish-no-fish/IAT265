@@ -1,0 +1,28 @@
+package factory;
+
+import movingobjects.Bullet;
+import movingobjects.BulletCasing;
+
+import static main.GunRangePanel.*;
+
+public class BulletConcreteFactory extends BulletFactory
+{
+
+	@Override
+	public Bullet createBullet(String mod, int offset) {
+		// TODO Auto-generated method stub
+		Bullet bullet = null;
+		
+		if (mod == "bullet")
+		{
+			bullet = new Bullet(WIN_W/2+(offset*50), WIN_H*0.8);
+		}
+		else if (mod == "casing")
+		{
+			bullet = new BulletCasing(994-80, 433-5)
+		}
+		
+		return bullet;
+	}
+
+}

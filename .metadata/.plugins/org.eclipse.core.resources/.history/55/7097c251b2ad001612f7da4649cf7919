@@ -1,0 +1,21 @@
+package movingobjects;
+
+import java.awt.Graphics2D;
+
+public class Pointer extends MovingObjects
+{
+	private double oldX, oldY;
+	public Pointer(double posx, double posy) {
+		super(posx, posy);
+		// TODO Auto-generated constructor stub
+		width = 25;
+		height = 25;
+	}
+
+	@Override
+	public void draw(Graphics2D g2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

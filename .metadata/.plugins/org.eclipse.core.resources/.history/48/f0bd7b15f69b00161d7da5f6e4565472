@@ -1,0 +1,290 @@
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import java.awt.*;
+import java.awt.geom.*;
+
+import javax.swing.JPanel;
+import javax.swing.Timer;
+
+public class FishPanel extends JPanel implements MouseListener, ActionListener 
+{
+	
+	public final static int WIN_H = 972;
+	public final static int WIN_W = 1728;
+
+	private ArrayList<Fish> npcFishes;
+	private Timer timer;
+	
+	private ArrayList<Ellipse2D.Double> rocksList;
+	
+	private	Rectangle2D.Double pond = new Rectangle2D.Double();
+	
+	private Ellipse2D.Double rock1 = new Ellipse2D.Double();
+	private Ellipse2D.Double rock2 = new Ellipse2D.Double();
+	private Ellipse2D.Double rock3 = new Ellipse2D.Double();
+	private Ellipse2D.Double rock4 = new Ellipse2D.Double();
+	private Ellipse2D.Double rock5 = new Ellipse2D.Double();
+	
+	private CubicCurve2D.Double seaweed1 = new CubicCurve2D.Double();
+	private CubicCurve2D.Double seaweed2 = new CubicCurve2D.Double();
+	private CubicCurve2D.Double seaweed3 = new CubicCurve2D.Double();
+	
+	private int numShark, numReg;
+	private double[] spawnPos;
+	private double spawnTimer;
+	
+	public FishPanel()
+	{
+		super();
+		npcFishes = new ArrayList<Fish>();
+		spawnPos = new double[3];
+		timer = new Timer(60,this);
+		timer.start();
+		
+		this.setPreferredSize(new Dimension(WIN_W, WIN_H));
+		this.setBackground(Color.white);
+		rocksList = new ArrayList<Ellipse2D.Double>();
+		spawnTimer = 0;		
+		addMouseListener(this);
+		npcFishes.add(new Herbivores( WIN_W/2, WIN_H/2, 1, Color.black, Color.white, 1));
+
+	}
+	
+	private void generateFish()
+	{
+		spawnPos();
+		if( Util.random(0,10) <= 5 && numShark < 2)
+		{
+			npcFishes.add(new Shark(
+					spawnPos[0],
+					spawnPos[1],
+					spawnPos[2]));
+			numShark++;
+		}
+		else
+		{
+			if (numReg < 8)
+			{
+				npcFishes.add(new Herbivores
+						(
+								spawnPos[0],
+								spawnPos[1],
+								Util.random(0.3, 0.75),
+								new Color(
+										(int) Util.random(1,255),
+										(int) Util.random(0,255),
+										(int) Util.random(0,255)
+										),
+								new Color(
+										(int) Util.random(0,255),
+										(int) Util.random(0,255),
+										(int) Util.random(0,255)
+										),
+								spawnPos[2]));
+				numReg++;				
+			}
+			else
+			{
+				npcFishes.add(new Shark(
+						spawnPos[0],
+						spawnPos[1],
+						spawnPos[2]));
+				numShark++;
+			}
+		}
+	}
+	
+	private void spawnNpc()
+	{
+//		if (System.currentTimeMillis()-spawnTimer >= 2000)
+//		{
+//			spawnTimer = System.currentTimeMillis();
+//			if (npcFishes.size() < 10)
+//			{
+//				generateFish();
+//			}
+//		}
+		
+	}
+	
+	private void spawnPos()
+	{
+		if (Util.random(0,100) < 50)
+		{
+			spawnPos[0] = -300;
+			spawnPos[1] = Util.random(200, WIN_H-200);
+			spawnPos[2] = 1;
+		}
+		else
+		{
+			spawnPos[0] = WIN_W+300;
+			spawnPos[1] = Util.random(200, WIN_H-200);
+			spawnPos[2] = -1;
+		}
+	}
+	
+	public void paintComponent(Graphics g)
+	{
+		Graphics2D g2 = (Graphics2D) g;
+		AffineTransform old = g2.getTransform();
+		super.paintComponent(g);
+		drawPond(g2);
+		drawRocks();
+		for (int i = 0; i < npcFishes.size(); i++)
+		{
+			Fish curr = npcFishes.get(i);
+			if (curr != null)
+			{
+				curr.drawFish(g);				
+			}			
+		}
+		g2.setTransform(old);
+		g2.setColor(Color.gray);
+		for (int i = 0; i < rocksList.size(); i++)
+		{
+			g2.fill(rocksList.get(i));
+		}		
+		drawSeaweeds(g2);		
+	}
+	
+	private void drawSeaweeds(Graphics2D g2)
+	{
+		g2.setColor(Color.green);
+		Point test = new Point(WIN_W/2+500, WIN_H);
+		seaweed1.setCurve(test.x, test.y-20, test.x-100, test.y-100-20, test.x+100, test.y-200-20, test.x, test.y-300-20);
+		seaweed2.setCurve(test.x-50, test.y-20, test.x-100-50, test.y-50-20, test.x+100-50, test.y-150-20, test.x-50, test.y-250-20);
+		seaweed3.setCurve(test.x+50, test.y-20, test.x-100+50, test.y-100+50-20, test.x+100+50, test.y-200+100-20, test.x+50, test.y-300+150-20);
+		g2.setStroke(new BasicStroke(20, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
+		g2.draw(seaweed1);
+		g2.draw(seaweed2);
+		g2.draw(seaweed3);
+	}
+	
+	private void drawPond(Graphics2D g2)
+	{
+		
+		pond.setFrame(0, 0, WIN_W, WIN_H);
+		Color pondColor = Color.decode("#1FBED6");
+		g2.setColor(pondColor);
+		g2.fill(pond);		
+	}
+	
+	private void drawRocks()
+	{
+//		System.out.println("Here");
+		rock1.setFrame(132, 944-100, 50, 25);
+		rock2.setFrame(385, 947-100, 50, 25);
+		rock3.setFrame(694, 893-100, 50, 25);
+		rock4.setFrame(1035, 963-100, 50, 25);
+		rock5.setFrame(1620, 964-100, 50, 25);
+		rocksList.add(rock1);		
+		rocksList.add(rock2);
+		rocksList.add(rock3);
+		rocksList.add(rock4);
+		rocksList.add(rock5);
+	}
+	
+	
+	private void fishUpdate()
+	{
+		for (int i = 0; i < npcFishes.size(); i++)
+		{
+			Fish curr = npcFishes.get(i);
+			if(curr != null)
+			{
+				curr.moveFish();
+				if (curr.isAlive() == false)
+				{
+					if (curr instanceof Herbivores)
+					{
+						numReg--;
+					}
+					else
+					{
+						numShark--;
+					}
+					npcFishes.remove(i);
+					break;
+				}
+					
+				for (int j = i+1; j < npcFishes.size(); j++)
+				{
+					Fish target = npcFishes.get(j);
+					if (curr.handleCollision(target))
+					{
+//						Util.signal();
+						if (curr instanceof Shark)
+						{
+							if (!(target instanceof Shark) && curr.getDirection() != target.getDirection())
+							{
+								Shark currShark = (Shark) curr;
+								currShark.eats(target.getSize());
+								target.kill();
+							}
+						}
+						else
+						{
+							if (!(target instanceof Shark))
+							{
+								curr.changeDirection();
+								target.changeDirection();
+								curr.setLocation(curr.getDirection()*3+curr.getLocation()[0] 
+										,curr.getLocation()[1]);
+								target.setLocation(target.getDirection()*3+target.getLocation()[0] 
+										,target.getLocation()[1]);								
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+		spawnNpc();
+//		fishUpdate();
+		repaint();
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+//		System.out.println(e.getX());
+//		System.out.println(e.getY());
+//		System.out.println("\n");
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+	}
+}
