@@ -1,0 +1,60 @@
+package factory;
+
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+
+import static main.GunRangePanel.*;
+
+public class TextFactory
+{
+	private Font font;
+	private String text;
+	private Rectangle rect = new Rectangle(WIN_W/2, WIN_H + 20, WIN_W, 20);
+	private double lifeTime = System.currentTimeMillis();
+	private boolean initialized = false;
+	private int x, y;
+	private boolean active = false;
+
+	public TextFactory(String text, int size) {
+		// TODO Auto-generated method stub
+		font = new Font("Arial", Font.BOLD, size);
+		this.text = text;
+	}
+	
+	public void draw(Graphics g)
+	{
+		if (active)
+		{
+		g.setFont(font);
+		if (initialized == false)
+		{
+			FontMetrics fontMeasure = g.getFontMetrics();
+		    x = (rect.width - fontMeasure.stringWidth(text)) / 2;
+//		    y = ((rect.height - fontMeasure.getHeight()) / 2) + fontMeasure.getAscent()*3;
+		    y = 0;
+		    initialized = true;
+		}
+	    if (System.currentTimeMillis() - lifeTime <= 1000)
+	    {
+	    	y+=5;
+	    	g.drawString(text, x, y);
+	    }
+	    else if (System.currentTimeMillis() - lifeTime <= 3000 && System.currentTimeMillis() - lifeTime >= 1000)
+	    {
+	    	g.drawString(text, x, y);
+	    }
+	    else
+	    {
+	    	y-=5;
+	    	g.drawString(text, x, y);
+	    }
+		}
+	}
+	
+	public double getLife()
+	{
+		return lifeTime;
+	}
+}

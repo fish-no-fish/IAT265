@@ -2,37 +2,37 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="held" key="selection"/>
+		<item value="movingobjects" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="heldTrigger"/>
-			<item value="oldX"/>
-			<item value="ball"/>
-			<item value="held"/>
-			<item value="there are problems"/>
-			<item value="problem"/>
-			<item value="sound"/>
-			<item value="mag"/>
+			<item value="movingobjects"/>
+			<item value="=="/>
+			<item value="reloadDetection"/>
+			<item value="pin"/>
+			<item value="bullet"/>
+			<item value="spawnAmmoTimer"/>
+			<item value="hitbox"/>
+			<item value="MAX_AMMO"/>
 		</list>
 		<list key="replacehistory">
+			<item value="fire"/>
+			<item value="bullet"/>
+			<item value="assets"/>
+			<item value="box"/>
 			<item value="held"/>
 			<item value="pin"/>
 			<item value="heldTrigger"/>
 			<item value="Ears"/>
-			<item value="12"/>
-			<item value="finsP"/>
-			<item value="speedx"/>
-			<item value="false"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="284" key="DIALOG_WIDTH"/>
 		<item value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI" key="DIALOG_FONT_NAME"/>
-		<item value="391" key="DIALOG_HEIGHT"/>
-		<item value="1065" key="DIALOG_X_ORIGIN"/>
-		<item value="336" key="DIALOG_Y_ORIGIN"/>
+		<item value="436" key="DIALOG_HEIGHT"/>
+		<item value="1324" key="DIALOG_X_ORIGIN"/>
+		<item value="286" key="DIALOG_Y_ORIGIN"/>
 	</section>
 </section>

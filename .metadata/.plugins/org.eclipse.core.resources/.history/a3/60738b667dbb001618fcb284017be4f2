@@ -1,0 +1,12 @@
+package factory;
+
+import movingobjects.Bullet;
+import movingobjects.MovingObjects;
+
+/* BulletFactory class to offer a clean creation interface for user that utilizes ConcreteBulletFactory
+ * CREATED: 11/23/2016
+ * AUTHOR: HENRY ZHAO*/
+public abstract class BulletFactory 
+{
+	abstract MovingObjects createBullet(String mod, int offset, int type);
+}

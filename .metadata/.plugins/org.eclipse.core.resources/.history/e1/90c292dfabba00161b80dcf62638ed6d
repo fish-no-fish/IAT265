@@ -1,0 +1,67 @@
+package sound;
+
+import ddf.minim.*;
+import processing.core.PApplet;
+
+public class Sound 
+{
+	private Minim minim;
+	private AudioPlayer song = null;
+	private String theSong;
+	private boolean canPlay;
+	
+	public Sound(String theSong)
+	{
+		minim = new Minim(new PApplet());
+		this.theSong = theSong;
+		canPlay = true;
+		switch (theSong)
+		{
+		case "SG1":
+			song = minim.loadFile("assets/shotgunCock1.wav");
+			break;
+		case "SG2":
+			song = minim.loadFile("assets/shotgunCock2.wav");
+			break;
+		case "ARFire":
+			song = minim.loadFile("assets/M4Fire.mp3");
+			break;
+		case "click":
+			song = minim.loadFile("assets/gunClick.mp3");
+			break;
+		case "clipIn":
+			song = minim.loadFile("assets/clipIn.mp3");
+			break;
+		case "clipOut":
+			song = minim.loadFile("assets/clipOut.mp3");
+			break;
+		case "chamberOut":
+			song = minim.loadFile("assets/ARChamberOut.mp3");
+			break;
+		case "chamberIn":
+			song = minim.loadFile("assets/ARChamberIn.mp3");
+			break;		
+		case "shell":
+			song = minim.loadFile("assets/shellFall.mp3");
+			break;
+		default:
+			song = null;
+			break;
+		}
+		
+	}
+	public void play()
+	{
+		if (canPlay)
+		{
+			song.play();
+			song.rewind();
+			if (theSong == "SG1" || theSong == "SG2")
+				canPlay = false;
+		}
+	}
+	public void setPlay(boolean var)
+	{
+		canPlay = var;
+	}
+}

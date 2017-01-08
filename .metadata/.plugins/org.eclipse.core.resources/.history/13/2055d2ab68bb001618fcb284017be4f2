@@ -1,0 +1,39 @@
+package movingobjects;
+
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
+import sound.Sound;
+
+public abstract class Guns extends MovingObjects
+{
+	protected BufferedImage overlay;
+	protected boolean gunLoaded;
+	protected Bullet bullet;
+	protected Sound fire;
+	protected Sound click;
+	protected BufferedImage muzzleFlash;
+	protected boolean flash;
+
+	public Guns(double posx, double posy) {
+		super(posx, posy);
+		// TODO Auto-generated constructor stub
+		click = new Sound("click");
+	}
+
+	@Override
+	public void draw(Graphics2D g2) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	abstract protected boolean eject();
+	abstract protected void manualReload();
+	abstract protected void wasteBullet();
+	abstract protected boolean fire();
+	protected boolean isGunLoaded()
+	{
+		return gunLoaded;
+	}
+
+}

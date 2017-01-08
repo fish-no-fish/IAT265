@@ -1,0 +1,87 @@
+package movingobjects;
+
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import main.GunRangePanel;
+
+/* BULLETCASING class provides animation and movement for all spent bullet shells
+ * CREATED: 11/18/2016
+ * AUTHOR: HENRY ZHAO*/
+public class BulletCasing extends MovingObjects
+{
+	private double x, y; //the special x and y coordinates to handle casing ejection animation 
+//	private double randomness;
+	public boolean delete; //status of whether to delete this casing when it's out of bounds
+	
+	/* WHAT IT DOES: Constructor for BulletCasing
+	 * PARAMETERS: 
+	 * 	posx - position x
+	 * 	posy - position y
+	 * 	type - which type of bullet casing to create, shell or .556 round
+	 * RETURN:*/
+	public BulletCasing(double posx, double posy, int type) {
+		super(posx, posy);
+		// TODO Auto-generated constructor stub
+		if (type == 1)
+		{
+			try {
+				avatar = ImageIO.read(getClass().getResourceAsStream("/assets/casing.png"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			width = 50*0.4;
+			height = 200*0.4;
+		}
+		else if (type == 2)
+		{
+			try {
+				avatar = ImageIO.read(getClass().getResourceAsStream("/assets/shotGunShell.png"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			width = avatar.getWidth()*.25;
+			height = avatar.getHeight()*.25;
+		}
+		angle = Math.toRadians(-90);
+		x = 0;
+		y = -(x*x)+3*x;
+//		randomness = 5 + Math.random() * (10 - 5);
+		delete = false;
+	}
+
+	@Override
+	public void draw(Graphics2D g2) {
+		// TODO Auto-generated method stub
+		update();
+		AffineTransform old = g2.getTransform();
+		g2.translate(posx, posy);
+		g2.rotate(angle);
+		g2.drawImage(avatar, (int) -width/2, (int) -height/2, (int) width, (int) height, null);
+		g2.setTransform(old);
+	}
+	
+	public void update()
+	{
+		x ++;
+//		test++;
+//		System.out.println(test);
+		y = -(x*x)+8*x;
+
+		angle++;
+		
+		posx += x;
+		posy -= y;
+		
+		if (posy+100 > GunRangePanel.WIN_H)
+		{
+			delete = true;
+		}
+	}
+
+}

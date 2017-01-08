@@ -1,0 +1,709 @@
+package main;
+
+import java.awt.event.*;
+import java.awt.image.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+
+import factory.BulletConcreteFactory;
+import factory.TextFactory;
+import movingobjects.*;
+import sound.Sound;
+
+import java.awt.*;
+
+/* Main panel that contains all base logistics and draws everything the user sees.
+ * CREATED: 11/10/2016
+ * AUTHOR: HENRY ZHAO*/
+public class GunRangePanel extends JPanel implements ActionListener, MouseListener, MouseMotionListener
+{
+	public static final int WIN_H = 972;	//default window height
+	public static final int WIN_W = 1728;	//default window width
+	public static final double PUMPX = 622;	//default shotgun pump position for ease of reset
+	private JFrame frame;	//parent frame
+	private BufferedImage bg;	//loaded background image
+	private Timer timer;	//main process timer
+	private Pointer pointer;	//pointer object to make collisions with objects easier
+	private MovingObjects held;	//stores which object is currently being clicked and dragged
+	private Magazine mag;	//creates the GunM4 default magazine
+	private ArrayList <Bullet> ammo = new ArrayList<Bullet>();	//array list of all spawned ammo
+	
+	private JButton spawnAmmo; //button to generate ammo
+		
+	private MovingObjects rifle; //base rifle object for GunM4
+	private SGPump pump; //base pump object for ShotGun object
+	private GunM4Pin pin; //base pin used for GunM4
+	private Trigger trigger; //base trigger loaded for both GunM4 and ShotGun
+	public ArrayList<BulletCasing> casings = new ArrayList<BulletCasing>();	//arraylist of all spent casings
+	private JButton spawnM4;	//button to spawn GunM4 gun
+	private JButton spawnSG;	//button to spawn ShotGun
+	
+	private BulletConcreteFactory bullets;	//loading factory to generate bullets
+	private static ArrayList<TextFactory> texts = new ArrayList<TextFactory>();	//loading factory to generate status texts
+	private ArrayList<Sound> SGSound = new ArrayList<Sound>();	//arraylist to store all ShotGun related sounds	
+	private ArrayList<Sound> ARSound = new ArrayList<Sound>();	//arraylist to store all GunM4 related sounds
+	private boolean ARSnappedBack = true; //determines whether GunM4's pin has been snapped back
+	private boolean SGSnappedBack = true; //determines whether ShotGun's pump has been pumped back
+	private Font tutorialMsg = new Font("Arial", Font.BOLD, 40);	//font for tutorial messages
+	private FontMetrics fontMeasure;	//measurement used to display tutorial messages
+	private Rectangle tutRect = new Rectangle();	//white background rectangle behind tutorial text
+	private boolean tutVisibility;	//changes whether the tutorial can be viewed
+	private JButton toggleTut;	//toggles tutVisibility
+	private static int tutState;	//stores the current position and state of the tutorial
+	
+	private JButton replay;	//button to replay the simulator
+	private JButton complete;	//button to complete the simulator and exit
+	private boolean restart;	//determines if the simulator should be restarted
+	private boolean start;	//determines if the simulator has started
+	private JButton startSim;	//button to start the simulator
+	private Font titles = new Font("Arial", Font.BOLD, 50);	//font used for intro and outro screen
+	
+	private boolean endSim; //determines when the player has pressed button to end simulator 
+	
+	/* WHAT IT DOES: Creates the default panel and sets all basic attributes for buttons texts and objects
+	 * PARAMETERS:
+	 * 	frame - parent JFrame used for dispose()
+	 * RETURN: NONE*/
+	public GunRangePanel(JFrame frame)
+	{
+		super();
+		this.frame = frame;
+		this.setPreferredSize(new Dimension(WIN_W, WIN_H));
+		setLayout(new FlowLayout());
+		try {
+			bg = ImageIO.read(getClass().getResourceAsStream("/assets/background.jpg"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		addMouseListener(this);
+		addMouseMotionListener(this);
+		timer = new Timer(60, this);
+		timer.start();
+		
+		pointer = new Pointer(0,0);
+		
+//		BUTTONS
+		spawnAmmo = new JButton("Spawn Ammo");
+		add(spawnAmmo);
+		spawnAmmo.setVisible(false);
+		spawnAmmo.addActionListener(this);
+		
+		bullets = new BulletConcreteFactory();
+		spawnM4 = new JButton("Spawn M4");
+		add(spawnM4);
+		spawnM4.setVisible(false);
+		spawnM4.addActionListener(this);
+		
+		spawnSG = new JButton("Spawn Shot Gun");
+		add(spawnSG);
+		spawnSG.setVisible(false);
+		spawnSG.addActionListener(this);		
+		
+		toggleTut = new JButton("Toggle Tutorial");
+		add(toggleTut);
+		toggleTut.setVisible(false);
+		toggleTut.addActionListener(this);
+		
+		complete = new JButton("I am done");
+		add(complete);
+		complete.setVisible(false);
+		complete.addActionListener(this);
+		
+		replay = new JButton("Replay");
+		add(replay);
+		replay.setVisible(false);
+		replay.addActionListener(this);
+		
+		tutState = 0;
+		tutVisibility = true;
+		restart = false;
+		start = false;
+		startSim = new JButton("Begin");
+		add(startSim);
+		startSim.addActionListener(this);
+		endSim = false;
+	}
+	
+	/* WHAT IT DOES: Creates the GunM4 object altogether 
+	 * PARAMETERS: NONE
+	 * RETURN: NONE*/
+	private void generateM4()
+	{
+		pin = new GunM4Pin(994,433);
+		trigger = new Trigger(1003.0, 490.0, 1);
+		rifle = new GunM4(WIN_W/2, WIN_H/2, pin, trigger);
+		mag = new Magazine(WIN_W/2-300, WIN_H/2);
+		ARSound.add(new Sound("clipIn"));
+		ARSound.add(new Sound("chamberIn"));
+		ARSound.add(new Sound("chamberOut"));
+	}
+	
+	/* WHAT IT DOES: Creates the ShotGun object altogether 
+	 * PARAMETERS: NONE
+	 * RETURN: NONE*/
+	private void generateSG()
+	{
+		trigger = new Trigger(1025, 455.0, 2);
+		pump = new SGPump(622, 428);
+		rifle = new ShotGun(WIN_W/2, WIN_H/2, pump, trigger);
+		SGSound.add(new Sound("SG1"));
+		SGSound.add(new Sound("SG2"));
+	}
+	
+	/* WHAT IT DOES: Generates ammo in a row of 5 
+	 * PARAMETERS: NONE
+	 * RETURN: NONE*/
+	private void generateAmmo()
+	{
+		int spawnTime = 60;
+		if (rifle instanceof GunM4)
+		{
+			for (int i = 0; i < 5; i++)
+			{
+				ammo.add((Bullet) bullets.createBullet("bullet", i, 1));
+			}
+		}
+		else if (rifle instanceof ShotGun)
+		{
+			for (int i = 0; i < 5; i++)
+			{
+				ammo.add((Bullet) bullets.createBullet("bullet", i, 2));
+			}
+		}
+	}
+	
+	/* WHAT IT DOES: Base paintComponent to draw everything the user sees 
+	 * PARAMETERS: 	
+	 *	g - Graphics brush
+	 * RETURN: NONE*/
+	public void paintComponent(Graphics g)
+	{
+		super.paintComponent(g);
+		Graphics2D g2 = (Graphics2D) g;
+
+		if (start == false)
+			drawStart(g2);
+		else if (endSim == true)
+			drawEnd(g2);
+		else
+		{
+			g.setColor(Color.WHITE);
+			g.setFont(tutorialMsg);
+	//		draw background
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_ON);
+			g.drawImage(bg, 0,0,WIN_W, WIN_H, null);
+			
+			for (int i = 0; i < texts.size(); i++)
+			{
+				texts.get(i).draw(g);
+				if (System.currentTimeMillis() - texts.get(i).getLife() > 2000)
+					texts.remove(i);
+			}
+			
+			if (mag != null && rifle != null && rifle instanceof GunM4 && ((GunM4)rifle).isLoaded() == false)
+			{
+				mag.draw(g2);
+			}
+			
+			if (rifle != null)
+			{
+				rifle.draw(g2);
+				if (rifle instanceof ShotGun)
+				{
+					if (((ShotGun)rifle).eject())
+						casings.add((BulletCasing) bullets.createBullet("casing", 0, 2));
+				}
+			}
+			for (int i = 0; i < casings.size(); i++)
+			{
+				if (casings.get(i).delete == true)
+				{
+					casings.remove(i);
+					new Sound("shell").play();
+				}
+				else
+				{
+					casings.get(i).draw(g2);
+				}
+			}
+			if (rifle != null && !(rifle instanceof GunM4))
+				mag = null;
+			for (int i = 0; i < ammo.size(); i++)
+			{
+				ammo.get(i).draw(g2);
+				if (mag != null)
+				{
+					if (ammo.get(i).handleCollision(mag) && ammo.get(i) != held)
+					{
+						mag.reload();
+						ammo.remove(i);
+					}
+				}
+				if (rifle instanceof ShotGun)
+				{
+					if (((ShotGun)rifle).chamberDetection(ammo.get(i)) && ammo.get(i) != held && ((ShotGun)rifle).isGunPumped())
+					{
+						((ShotGun)rifle).setChambered(true, ammo.get(i));
+						ammo.remove(i);
+					}
+				}
+			}
+			
+	//		g.drawString("Testing", 500, 500);
+//			handles tutorial visibility, which tutorial message to draw
+			if (tutVisibility)
+			{
+				switch (tutState)
+				{
+				case(11):
+					drawTut("First we reload the magazine. Press Spawn Ammo.", g2);
+					break;
+				case(12):
+					drawTut("Drag the bullets into the magazine!", g2);
+					break;
+				case(13):
+					drawTut("Now slide the magazine into the gun.", g2);
+					break;
+				case(14):
+					drawTut("Now pull the pin of the gun back to cock the gun.", g2);
+					break;
+				case(15):
+					drawTut("Gun is now loaded, press the trigger to fire it", g2);
+					break;
+				case(16):
+					drawTut("Looks like you're all out. Press the magazine to eject!", g2);
+					break;
+				case(17):
+					drawTut("You know how to reload now, good luck!", g2);
+					break;
+	//				Shotgun Tutorial
+				case(21):
+					drawTut("First we spawn some ammo, press Spawn Ammo", g2);
+					break;
+				case(22):
+					drawTut("Pump the shotgun to reveal the ammo insert", g2);
+					break;
+				case(23):
+					drawTut("Drag a shell into the bullet inset", g2);
+					break;
+				case(24):
+					drawTut("Now pull the pump back to cock the gun", g2);
+					break;
+				case(25):
+					drawTut("Your gun is now loaded, fire!", g2);
+					break;
+				case(26):
+					drawTut("Pull the pump back once more to eject the shell", g2);
+					break;
+				case(27):
+					drawTut("You know how to reload now, good luck!", g2);
+					break;
+				default:
+	//				drawTut("Testing", g2, 500, 500);
+					break;
+				}
+			}
+		}
+			
+	}
+	
+	/* WHAT IT DOES: Setter method for variable tutState 
+	 * PARAMETERS: 
+	 * 	state - desired state to set to
+	 * RETURN: NONE*/
+	public static void setTut(int state)
+	{
+		tutState = state;
+	}
+	
+	/* WHAT IT DOES: Getter method for variable tutState 
+	 * PARAMETERS: NONE
+	 * RETURN: int - current tutState value*/
+	public static int getTut()
+	{
+		return tutState;
+	}
+	
+	/* WHAT IT DOES: Handles drawing and displaying of tutorial including its background 
+	 * PARAMETERS: 
+	 * 	text - what text to draw
+	 * 	g2 - Graphics2D brush
+	 * RETURN: NONE*/
+	private void drawTut(String text, Graphics2D g2)
+	{ 
+		int x = 10;
+		int y = WIN_H-200;
+		fontMeasure = g2.getFontMetrics();
+		int boxX = fontMeasure.stringWidth(text)+100;
+		int boxY = fontMeasure.getHeight()+50;
+		tutRect.setFrame(x-50, y-boxY/2, boxX, boxY);
+		Color boxColor = new Color(255,255,255,204);
+		g2.setColor(boxColor);
+		g2.fill(tutRect);
+		g2.setColor(Color.BLACK);
+//		x = (tutRect.width - fontMeasure.stringWidth(text)) / 2;
+//	    y = ((tutRect.height - fontMeasure.getHeight()) / 2) + fontMeasure.getAscent();
+		g2.drawString(text, x,
+				y+fontMeasure.getHeight()/2);
+	}
+	
+	/* WHAT IT DOES: Adds status texts to the screen via the texts arraylist
+	 * PARAMETERS: 
+	 * 	text - text to display
+	 * RETURN: NONE*/
+	public static void addText(String text)
+	{
+		texts.add(new TextFactory(text, 40));
+	}
+	
+	/* WHAT IT DOES: Removes all ammo on the table for use during reset 
+	 * PARAMETERS: NONE
+	 * RETURN: NONE*/
+	private void clearAmmo()
+	{
+		for (int i = ammo.size()-1; i >= 0; i--)
+		{
+			ammo.remove(i);
+		}
+	}
+	
+	/* WHAT IT DOES: Draws the starting intro screen 
+	 * PARAMETERS: 
+	 * 	g2 - Graphics2D brush
+	 * RETURN: NONE*/
+	private void drawStart(Graphics2D g2)
+	{
+		g2.setColor(Color.BLACK);
+		g2.fillRect(0,0,WIN_W,WIN_H);
+		g2.setFont(titles);
+		g2.setColor(Color.white);
+		g2.drawString("Welcome to the Gun Range simulator", WIN_W/2-450, WIN_H/4);
+
+		g2.drawString("Here you will simulate the mechanisms of a Rifle and a Shot Gun.", WIN_W/2-780, WIN_H/2);
+
+		g2.drawString("Press Begin when ready", WIN_W/2-300, WIN_H/2+400);
+	}
+	
+	/* WHAT IT DOES: Draws the ending outro screen 
+	 * PARAMETERS: 
+	 * 	g2 - Graphics2D brush
+	 * RETURN: NONE*/
+	private void drawEnd(Graphics2D g2)
+	{
+		g2.setColor(Color.BLACK);
+		g2.fillRect(0,0,WIN_W,WIN_H);
+		g2.setFont(titles);
+		g2.setColor(Color.white);
+		g2.drawString("Thank you for trying this Gun Range Simulator", WIN_W/2-550, WIN_H/4);
+
+		g2.drawString("Here you will simulate the mechanisms of a Rifle and a Shot Gun.", WIN_W/2-780, WIN_H/2);
+
+		g2.drawString("Press Replay to play again", WIN_W/2-300, WIN_H/2+400);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getActionCommand() == "Spawn Ammo")
+		{
+			generateAmmo();
+			if (rifle != null && rifle instanceof GunM4)
+				tutState = 12;
+			else if (rifle != null && rifle instanceof ShotGun)
+				tutState = 22;
+		}
+		if (e.getActionCommand() == "Spawn M4")
+		{
+			clearAmmo();
+			generateM4();
+			tutState = 11;
+		}
+		if (e.getActionCommand() == "Spawn Shot Gun")
+		{
+			clearAmmo();
+			generateSG();
+			tutState = 21;
+		}
+		if (e.getActionCommand() == "Toggle Tutorial")
+			tutVisibility = !tutVisibility;
+//		for (int i = 0; i < casings.size(); i++)
+//		{
+//			casings.get(i).update();
+//		}
+		if (tutState == 12 && mag != null && mag.isEmpty() == false)
+			tutState = 13;
+		if (e.getActionCommand() == "I am done")
+		{
+			replay.setVisible(true);
+			spawnAmmo.setVisible(false);
+			spawnM4.setVisible(false);
+			spawnSG.setVisible(false);
+			toggleTut.setVisible(false);
+			complete.setVisible(false);
+			endSim = true;
+			
+		}
+		if (e.getActionCommand() == "Replay")
+			restart = true;
+		
+		if (restart)
+		{
+			frame.dispose();
+			frame = new GunRangeApp("The Gun Range");
+			restart = false;
+		}
+		if (e.getActionCommand() == "Begin")
+		{
+			start = true;
+			startSim.setVisible(false);
+			spawnAmmo.setVisible(true);
+			spawnM4.setVisible(true);
+			spawnSG.setVisible(true);
+			toggleTut.setVisible(true);
+			complete.setVisible(true);
+		}
+		
+		repaint();
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+//		LOADING/DRAGGING THE BULLET
+		System.out.println(e.getX());
+		System.out.println(e.getY());
+		for (int i = 0; i < ammo.size(); i++)
+		{
+			if(ammo.get(i).handleCollision(pointer))
+			{
+				held = ammo.get(i);
+			}
+		}
+		if (mag != null)
+		{
+			if(mag.handleCollision(pointer) && mag.isLoaded() == false)
+			{
+				held = mag;
+			}
+			if(mag.handleCollision(pointer) && mag.isLoaded() == true)
+			{
+				if (rifle instanceof GunM4)
+					((GunM4) rifle).eject();
+			}
+		}
+		if (pin != null)
+		{
+			if(pin.handleCollision(pointer))
+			{
+				pointer.setOldX(e.getX());
+				pointer.setOldY(e.getY());
+				pin.setOldX(pin.getX());
+				pin.setOldY(pin.getY());
+				held = pin;
+			}
+		}
+		if (trigger != null)
+		{
+			if(trigger.handleCollision(pointer))
+			{
+				trigger.fire();
+				if (rifle instanceof GunM4)
+				{
+					if(((GunM4) rifle).fire())
+						casings.add((BulletCasing) bullets.createBullet("casing", 0, 1));						
+				}
+				if (rifle instanceof ShotGun)
+				{
+					((ShotGun)rifle).fire();
+				}
+			}
+		}
+		if (pump != null)
+		{
+			if (pump.handleCollision(pointer))
+			{
+				pointer.setOldX(e.getX());
+				pointer.setOldY(e.getY());
+//				pump.setOldX(pump.getX());
+//				pump.setOldY(pump.getY());
+				held = pump;
+			}
+		}
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		if (held instanceof Bullet)
+		{
+			if (mag != null)
+			{
+				if (held.handleCollision(mag) == false)
+				{
+					held.setAngle(0);				
+				}
+			}
+			else if(rifle instanceof ShotGun)
+			{
+				if (((ShotGun)rifle).chamberDetection((Bullet)held) == false)
+				{
+					held.setAngle(0);
+				}
+			}
+		}
+		if (held instanceof GunM4Pin)
+		{
+//			snap back effect
+			GunM4Pin heldTrigger = (GunM4Pin) held;
+			heldTrigger.setPos(heldTrigger.getOldX(), heldTrigger.getOldY());
+			ARSnappedBack = true;
+			ARSound.get(2).play();
+		}
+		if (held instanceof SGPump)
+		{
+			pump.setOldX(pump.getX());
+		}
+		held = null;
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		pointer.setPos(arg0.getX(), arg0.getY());
+		if (held != null)
+		{
+			if (held instanceof GunM4Pin)
+			{
+//				if holding the M4 pin, handle the manual reload and waste bullet mechanic
+				GunM4Pin heldTrigger = (GunM4Pin) held;
+				if (heldTrigger.getX() >= heldTrigger.getOldX() && heldTrigger.getX() < heldTrigger.getOldX() + 100)
+				{
+					heldTrigger.setPos(
+						heldTrigger.getOldX()+(pointer.getX()-pointer.getOldX()), heldTrigger.getY());
+					ARSound.get(1).play();
+				}
+				if (heldTrigger.getX() > heldTrigger.getOldX() + 100)
+					heldTrigger.setPos(heldTrigger.getOldX()+100, heldTrigger.getOldY());
+				if (((GunM4) rifle).isLoaded() == true && heldTrigger.getX() >= heldTrigger.getOldX() + 90)
+				{
+					if (ARSnappedBack == true)
+					{
+						ARSnappedBack = false;
+						if (((GunM4)rifle).isGunLoaded() == true)
+						{
+								((GunM4)rifle).wasteBullet();
+								casings.add((BulletCasing) bullets.createBullet("casing", 0, 1));
+						}
+							else
+								((GunM4) rifle).manualReload();
+						}
+				}
+				
+			}
+			else if (held instanceof SGPump)
+			{
+//				if holding the shot gun pump, handle detection for manual reload and waste bullet
+				if (held.getX() >= PUMPX && held.getX() <= PUMPX + 100)
+				{
+					held.setPos(held.getOldX() + (pointer.getX()-pointer.getOldX()), held.getY());
+				}
+//				CHECK NOT OUT OF BOUNDS
+				if (held.getX() > PUMPX + 100)
+				{
+					held.setPos(PUMPX+100, held.getY());
+				}
+				if (held.getX() < PUMPX)
+				{
+					held.setPos(PUMPX, held.getY());
+				}
+				if (held.getX() >= PUMPX + 90)
+				{
+					SGSound.get(0).play();
+					SGSound.get(1).setPlay(true);
+//					((ShotGun) rifle).manualReload();
+					((ShotGun) rifle).setGunPumped(true);
+					if (GunRangePanel.getTut() == 22)
+					{
+						GunRangePanel.setTut(23);
+					}
+					if (((ShotGun)rifle).isGunLoaded() == true)
+					{
+						((ShotGun)rifle).wasteBullet();
+						casings.add((BulletCasing) bullets.createBullet("casing", 0, 2));
+					}
+					SGSnappedBack = true;
+				}
+				if (held.getX() == PUMPX && ((ShotGun) rifle).isGunPumped())
+				{
+					SGSound.get(1).play();
+					SGSound.get(0).setPlay(true);
+					((ShotGun) rifle).setGunPumped(false);
+					if (((ShotGun) rifle).isChambered())
+					{
+						((ShotGun) rifle).manualReload();
+					}
+					SGSnappedBack = false;
+				}
+				 
+			}
+			else
+			{
+				held.setPos(pointer.getX(), pointer.getY());
+				if (held instanceof Bullet)
+				{
+//					if holding bullet, handle detection with magazine or shotgun chamber
+					if (mag != null)
+						((Bullet) held).handleProximity(mag);
+					if (rifle instanceof ShotGun)
+					{
+//						if (((ShotGun) rifle).chamberDetection((Bullet) held))
+							((Bullet) held).handleProximity((ShotGun) rifle);
+					}
+				}
+				else if(held instanceof Magazine)
+				{
+//					if holding magazine, handle reload and loading of mag into gun
+					if (((GunM4) rifle).reloadDetection(mag))
+					{
+						mag.setLoaded(true);
+						mag.setPos(904.0,555.0);
+						ARSound.get(0).play();
+						held = null;
+					}
+				}
+			}
+			repaint();
+		}
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent arg0) {
+		// TODO Auto-generated method stub	
+//		always set current pointer pos to pointer object
+		pointer.setPos(arg0.getX(), arg0.getY());
+	}
+	
+}

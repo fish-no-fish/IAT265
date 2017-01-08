@@ -1,0 +1,171 @@
+package movingobjects;
+
+import static java.lang.Math.abs;
+import static java.lang.Math.sqrt;
+
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import main.GunRangePanel;
+
+/* MAGAZINE class to provide all magazine interactions ie. Loading bullet and inserting into GunM4
+ * CREATED: 11/11/2016
+ * AUTHOR: HENRY ZHAO*/
+public class Magazine extends MovingObjects
+{
+	private final static int MAX_AMMO = 30; //The max amount of bullets that can be loaded into the magazine
+	private int numLoaded; //number that is loaded into the magazine
+	private Rectangle2D.Double openSlot; //hitbox for the magazine's entrance
+	private boolean loaded; //status of whether this magazine is slotted into a rifle
+	private boolean eject; //status of whether the current magazine is being ejected
+	
+	/* WHAT IT DOES: Constructor for Magazine class 
+	 * PARAMETERS: 
+	 * 	posx - position x
+	 * 	posy - position y
+	 * RETURN: NONE*/
+	public Magazine(double posx, double posy) {
+		super(posx, posy);
+		// TODO Auto-generated constructor stub
+		try {
+			avatar = ImageIO.read(getClass().getResourceAsStream("/assets/m16magazine.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		width = 123*1;
+		height = 225*1;
+		
+		numLoaded = 0;
+		setOpenSlot(new Rectangle2D.Double());
+		setLoaded(false);
+		
+		eject = false;
+	}
+
+	/* WHAT IT DOES: Draws the Magazine object
+	 * PARAMETERS:
+	 * 	g2 - Graphics2D brush
+	 * RETURN: NONE*/
+	@Override
+	public void draw(Graphics2D g2) {
+		// TODO Auto-generated method stub
+		oldC = g2.getComposite();
+		opacity = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, initialOpacity);
+		g2.setComposite(opacity);
+
+		getOpenSlot().setFrame(posx-width/4.5, posy-15-height/2, width/1.5, 30);
+//		g2.fill(getOpenSlot());
+		g2.drawImage(avatar, (int) (posx-width/2), (int) (posy-height/2), (int) width, (int) height, null);
+		if (eject)
+		{
+			fallDown();
+		}
+		appear();
+		g2.setComposite(oldC);
+	}
+
+	/* WHAT IT DOES: Special distance for magazine calculation. Aiming for the top of the entrance
+	 * PARAMETERS:
+	 * 	target - the target to compare with this magazine's opening 
+	 * RETURN: Double - distance to this magazine's opening*/
+	public double distMag(MovingObjects target)
+	{
+		return sqrt((abs(posx-target.posx)*abs(posx-target.posx))+
+				(abs((posy-(width/2*.9))-target.posy)*abs((posy-(width/2*.9))-target.posy)));
+	}
+	
+	/* WHAT IT DOES: Handles reloading of bullets
+	 * PARAMETERS: NOTHING
+	 * RETURN: Boolean - if reloading was successful*/
+	public boolean reload()
+	{
+		if (numLoaded < MAX_AMMO)
+		{
+			numLoaded++;
+			return true;
+		}
+		return false;
+	}
+	
+	/* WHAT IT DOES: Reports if the magazine is empty
+	 * PARAMETERS: NONE
+	 * RETURN: Boolean - status of if the magazine is empty*/
+	public boolean isEmpty()
+	{
+		if (numLoaded <= 0)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	/* WHAT IT DOES: Handles logistics of using a bullet from the magazine 
+	 * PARAMETERS: NONE
+	 * RETURN: NONE*/
+	public void useBullet()
+	{
+		if (!(isEmpty()))
+		{
+			numLoaded--;
+		}
+	}
+
+	/* WHAT IT DOES: Getter method for the hitbox of the magazine's opening
+	 * PARAMETERS: NONE
+	 * RETURN: Hitbox of the magazine's opening*/
+	public Rectangle2D.Double getOpenSlot() {
+		return openSlot;
+	}
+
+	/* WHAT IT DOES: Setter method for dynamically moving the magazine's opening
+	 * PARAMETERS: 
+	 * 	openSlot - the new opening of the magazine
+	 * RETURN: NONE*/
+	public void setOpenSlot(Rectangle2D.Double openSlot) {
+		this.openSlot = openSlot;
+	}
+
+	/* WHAT IT DOES: Getter method of variable loaded 
+	 * PARAMETERS: NONE
+	 * RETURN: Status of whether the magazine is loaded into a gun*/
+	public boolean isLoaded() {
+		return loaded;
+	}
+
+	/* WHAT IT DOES: Setter method of variable loaded 
+	 * PARAMETERS: Desired status of magazine loading
+	 * RETURN: NONE*/
+	public void setLoaded(boolean loaded) {
+		this.loaded = loaded;
+	}
+	
+	/* WHAT IT DOES: 
+	 * PARAMETERS: 
+	 * RETURN:*/
+	public void fallDown()
+	{
+		if (posy < 750)
+		{
+			System.out.println(GunRangePanel.WIN_H - 500);
+			System.out.println(posy);
+			posy+=10;
+		}
+		else
+		{
+			eject = false;
+		}
+	}
+	
+	public void setEject()
+	{
+		oldY = posy;
+		eject = true;
+		loaded = false;
+		numLoaded = 0;
+	}
+}

@@ -1,0 +1,10 @@
+package factory;
+
+import java.awt.Font;
+import java.awt.Graphics;
+
+abstract public class WarningTextFactory 
+{
+	abstract Font createText(String text, int size, Graphics g);
+	
+}

@@ -1,0 +1,15 @@
+package factory;
+
+import sound.Sound;
+
+public class SoundConcreteFactory extends SoundFactory 
+{
+
+	@Override
+	Sound createSound(String thisSong) {
+		// TODO Auto-generated method stub
+		Sound theSound = null;
+		
+	}
+	
+}

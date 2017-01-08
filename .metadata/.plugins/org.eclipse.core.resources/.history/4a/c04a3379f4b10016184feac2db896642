@@ -1,5 +1,0 @@
-package factory;
-
-public abstract class BulletFactory {
-	abstract Bullet createBullet(String char);
-}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/week 13-lec-demo-2-sound-visualization/src/main/ParticleApp.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="main.ParticleApp"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="week 13-lec-demo-2-sound-visualization"/>
+</launchConfiguration>

@@ -1,0 +1,53 @@
+package sound;
+import java.io.IOException;
+
+import ddf.minim.*;
+import processing.core.PApplet;
+
+public class Sound 
+{
+	private Minim minim;
+	private AudioPlayer song = null;
+	private String theSong;
+	private boolean canPlay;
+	
+	public Sound(String theSong)
+	{
+		minim = new Minim(new PApplet());
+		this.theSong = theSong;
+		canPlay = true;
+		switch (theSong)
+		{
+		case "SG1":
+			song = minim.loadFile("assets/shotgunCock1.wav");
+			break;
+		case "SG2":
+			song = minim.loadFile("assets/shotgunCock2.wav");
+			break;
+		case "ARFire":
+			System.out.println(theSong);
+			song = minim.loadFile("assets/M4Fire.mp3");
+			break;
+		case "click":
+			song = minim.loadFile("assets/click.wav");
+		default:
+			song = null;
+			break;
+		}
+		
+	}
+	public void play()
+	{
+		if (canPlay)
+		{
+			song.play();
+			song.rewind();
+			if (theSong != "ARFire")
+				canPlay = false;
+		}
+	}
+	public void setPlay(boolean var)
+	{
+		canPlay = var;
+	}
+}

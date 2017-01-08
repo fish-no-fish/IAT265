@@ -1,0 +1,8 @@
+package factory;
+
+import sound.Sound;
+
+public abstract class SoundFactory {
+
+	abstract Sound createSound(String thisSong);
+}

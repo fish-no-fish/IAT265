@@ -1,0 +1,35 @@
+package factory;
+
+import movingobjects.Bullet;
+import movingobjects.BulletCasing;
+import movingobjects.MovingObjects;
+
+import static main.GunRangePanel.*;
+
+/* BulletConcreteFactory implements the abstract classes from BulletFactory. Creates bullets and casings
+ * 	of all types
+ * CREATED: 11/23/2016
+ * AUTHOR: HENRY ZHAO*/
+public class BulletConcreteFactory extends BulletFactory
+{
+	/* WHAT IT DOES: 
+	 * PARAMETERS: 
+	 * RETURN:*/
+	@Override
+	public MovingObjects createBullet(String mod, int offset, int type) {
+		// TODO Auto-generated method stub
+		MovingObjects bullet = null;
+		
+		if (mod == "bullet")
+		{
+			bullet = new Bullet(WIN_W-300+(offset*60*.4), WIN_H-300, type);	
+		}
+		else if (mod == "casing")
+		{
+			bullet = new BulletCasing(994-80, 433-5, type);
+		}
+		
+		return bullet;
+	}
+
+}

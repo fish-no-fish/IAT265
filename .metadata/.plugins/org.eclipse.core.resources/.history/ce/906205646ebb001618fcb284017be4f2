@@ -1,0 +1,45 @@
+package movingobjects;
+
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
+import sound.Sound;
+
+public abstract class Guns extends MovingObjects
+{
+	protected BufferedImage overlay; //Stores the overlay image of both rifles to cover part images
+	protected boolean gunLoaded; //Stores the status of whether the current gun is loaded
+	protected Bullet bullet; //Stores the placeholder bullet that the guns will use to display the bullet in their chamber
+	protected Sound fire; //The sound file to play when the gun has been fired
+	protected Sound click; //Sound file to play if the gun cannot fire, but trigger has been pulled
+	protected BufferedImage muzzleFlash; //The muzzle flash image to be displayed when the gun is fired
+	protected boolean flash; //Stores the status of whether or not to display the muzzleFlash, and when
+	protected Trigger trigger; //Stores the trigger object of the gun
+	protected double jerkTimer; //Stores how long the gun should be jerked back after firing
+
+	/* WHAT IT DOES: 
+	 * PARAMETERS: 
+	 * RETURN:*/
+	public Guns(double posx, double posy) {
+		super(posx, posy);
+		// TODO Auto-generated constructor stub
+		click = new Sound("click");
+		jerkTimer = 0;
+	}
+
+	@Override
+	public void draw(Graphics2D g2) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	abstract protected boolean eject();
+	abstract protected void manualReload();
+	abstract protected void wasteBullet();
+	abstract protected boolean fire();
+	public boolean isGunLoaded()
+	{
+		return gunLoaded;
+	}
+
+}

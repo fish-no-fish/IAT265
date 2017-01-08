@@ -1,0 +1,22 @@
+package movingobjects;
+
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
+public class Guns extends MovingObjects
+{
+	protected BufferedImage overlay;
+	protected boolean gunLoaded;
+
+	public Guns(double posx, double posy) {
+		super(posx, posy);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public void draw(Graphics2D g2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

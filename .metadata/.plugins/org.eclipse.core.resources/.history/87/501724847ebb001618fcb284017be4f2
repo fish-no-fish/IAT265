@@ -1,0 +1,23 @@
+package main;
+
+import javax.swing.JFrame;
+
+/* TRIGGER class provides display and cursor interaction for the GunM4 object
+ * CREATED: 11/10/2016
+ * AUTHOR: HENRY ZHAO*/
+public class GunRangeApp extends JFrame
+{
+	public GunRangeApp(String title) {
+		super(title);
+		this.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+		GunRangePanel ip = new GunRangePanel(this);
+		this.add(ip);
+		this.pack();
+		this.setLocationRelativeTo(null);
+		this.setVisible(true);	
+	}
+	
+	public static void main(String[] args) {
+		new GunRangeApp("The Gun Range");
+	}
+}

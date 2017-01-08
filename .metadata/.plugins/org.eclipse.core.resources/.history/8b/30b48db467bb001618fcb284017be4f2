@@ -1,0 +1,263 @@
+package movingobjects;
+
+import static java.lang.Math.abs;
+import static java.lang.Math.sqrt;
+
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import ddf.minim.AudioPlayer;
+import ddf.minim.Minim;
+import factory.TextFactory;
+import main.GunRangePanel;
+import processing.core.PApplet;
+import sound.Sound;
+
+public class ShotGun extends Guns
+{
+	private SGPump pump;
+	private boolean gunPumped;
+	private boolean chambered;
+	private Rectangle2D.Double chamber;
+	private Bullet chamberedBullet;
+	private Trigger trigger;
+	private boolean emptyShell;
+	private boolean flash;
+	private BufferedImage muzzleFlash;
+	private double jerkTimer;
+	private Bullet tempEjection;
+	
+	private Sound fire;
+	private Sound click;	
+
+	public ShotGun(double posx, double posy, SGPump pump, Trigger trigger) {
+		super(posx, posy);
+		// TODO Auto-generated constructor stub
+		try {
+			avatar = ImageIO.read(getClass().getResourceAsStream("/assets/SGBase.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			overlay = ImageIO.read(getClass().getResourceAsStream("/assets/SGOverlay.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			muzzleFlash = ImageIO.read(getClass().getResourceAsStream("/assets/SGFlash.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		this.pump = pump;
+		width = avatar.getWidth();
+		height = avatar.getHeight();
+		gunLoaded = false;
+		gunPumped = false;
+		chambered = false;
+		chamber = new Rectangle2D.Double();
+		chamber.setFrame((int)(pump.getX()-pump.getW()/2+400-94/2+5), (int)(pump.getY()-pump.getH()/2-20), 94, 29);
+		this.trigger = trigger;
+		emptyShell = false;
+		jerkTimer = 0;
+		tempEjection = new Bullet(chamber.getCenterX(), chamber.getCenterY(), 2);
+		tempEjection.setAngle(-90);
+		
+		fire = new Sound("SGFire");
+		click = new Sound("click");
+	}
+	
+//	public void debug()
+//	{
+//		System.out.println(" ");
+//		System.out.println("loaded " + gunLoaded);
+//		System.out.println("pumped " + gunPumped);
+//		System.out.println("chambered " + chambered);
+//		System.out.println("spent shell " + emptyShell);
+//	}
+
+	@Override
+	public void draw(Graphics2D g2) {
+		// TODO Auto-generated method stub
+		old = g2.getTransform();
+		oldC = g2.getComposite();
+		if (System.currentTimeMillis() - jerkTimer >= 250/2 && jerkTimer != 0)
+		{
+			jerkTimer = 0;
+			posx -= 50;
+			angle = 0;
+			flash = false;
+		}
+		g2.translate(posx, posy);
+		g2.rotate(Math.toRadians(angle));
+		
+		opacity = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, initialOpacity);
+		
+		g2.drawImage(avatar, -avatar.getWidth()/2, -avatar.getHeight()/2, avatar.getWidth(), avatar.getHeight(), null);
+		AffineTransform adjustment = g2.getTransform();
+		g2.translate(-posx, -posy);
+		if (chamberedBullet != null)
+		{
+			chamberedBullet.setAngle(-90);
+			chamberedBullet.setPos(chamber.getCenterX(), chamber.getCenterY());
+			chamberedBullet.draw(g2);
+		}
+		if (emptyShell)
+			tempEjection.draw(g2);
+		pump.draw(g2);
+		trigger.draw(g2);
+		g2.setTransform(adjustment);
+//		g2.fill(chamber);
+//		g2.translate(posx, posy);
+		if (flash)
+		{
+			g2.drawImage(muzzleFlash, -muzzleFlash.getWidth()/2-870, -muzzleFlash.getHeight()/2-70, 
+					muzzleFlash.getWidth(), muzzleFlash.getHeight(), null);
+		}
+		g2.drawImage(overlay, -overlay.getWidth()/2, -overlay.getHeight()/2, overlay.getWidth(), overlay.getHeight(), null);
+		appear();
+		g2.setComposite(oldC);
+		g2.setTransform(old);
+	}
+	
+	public boolean chamberDetection(Bullet bullet)
+	{
+		if (chamber.intersects(bullet.getHitbox()))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public double distToChamber(MovingObjects target)
+	{
+		return sqrt((abs(chamber.getX()-target.posx)*abs(chamber.getX()-target.posx))+
+				(abs(chamber.getY()-target.posy)*abs(chamber.getY()-target.posy)));
+	}
+	
+	public boolean fire()
+	{
+		if (gunLoaded == false || gunPumped)
+		{
+			System.out.println("no bullet");
+			GunRangePanel.addText("No Shell Loaded");
+			click.play();
+//			GunRangePanel.texts.add(new TextFactory("Test", 40));
+
+			return false;
+		}
+		else
+		{
+			System.out.println("fired");
+			gunLoaded = false;
+			chamberedBullet = null;
+			chambered = false;
+			emptyShell = true;
+			jerkTimer = System.currentTimeMillis();
+			flash = true;
+			angle = 10;
+			posx += 50;
+			
+			fire.play();
+			if (GunRangePanel.getTut() == 25)
+			{
+				GunRangePanel.setTut(26);
+			}
+			return true;
+		}
+	}
+	
+	public boolean eject()
+	{
+		if (gunPumped && emptyShell)
+		{	
+			emptyShell = false;
+			GunRangePanel.addText("Shell Ejected");
+
+			if (GunRangePanel.getTut() == 26)
+			{
+				GunRangePanel.setTut(27);
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	public void manualReload()
+	{
+		if(gunLoaded == false)
+		{
+			System.out.println("manual reloaded");
+			gunLoaded = true;
+			GunRangePanel.addText("Gun Reloaded");
+			if (GunRangePanel.getTut() == 24)
+			{
+				GunRangePanel.setTut(25);
+			}
+		}
+		
+	}
+
+	/**
+	 * @return the gunPumped
+	 */
+	public boolean isGunPumped() {
+		return gunPumped;
+	}
+
+	/**
+	 * @param gunPumped the gunPumped to set
+	 */
+	public void setGunPumped(boolean gunPumped) {
+		this.gunPumped = gunPumped;
+
+	}
+
+	/**
+	 * @return the chambered
+	 */
+	public boolean isChambered() {
+		return chambered;
+	}
+	
+	public boolean isGunLoaded()
+	{
+		return gunLoaded;
+	}
+	
+	public void wasteBullet()
+	{
+		chambered = false;
+		chamberedBullet = null;
+		gunLoaded = false;
+		GunRangePanel.addText("Shell Ejected");
+	}
+
+	/**
+	 * @param chambered the chambered to set
+	 */
+	public void setChambered(boolean chambered, Bullet bullet) {
+		chamberedBullet = bullet;
+		this.chambered = chambered;
+		GunRangePanel.addText("Gun Chambered");
+		if (GunRangePanel.getTut() == 23)
+		{
+			GunRangePanel.setTut(24);
+		}
+	}
+	
+	public Rectangle2D.Double getChamber()
+	{
+		return chamber;
+	}
+
+}

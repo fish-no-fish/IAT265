@@ -1,0 +1,101 @@
+package movingobjects;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+/**/
+public class Trigger extends MovingObjects
+{
+	private boolean firing; //determine if the trigger has been pressed
+	
+	/* WHAT IT DOES: Constructor for the Trigger class
+	 * PARAMETERS: posx - x position, posy - y position, type - type of trigger to create
+	 * RETURN: NONE*/
+	public Trigger(double posx, double posy, int type) {
+		super(posx, posy);
+		// TODO Auto-generated constructor stub
+		if (type == 1)
+		{
+			try {
+				avatar = ImageIO.read(getClass().getResourceAsStream("/assets/fireTrigger.png"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			width = 47*0.4;
+			height = 120*0.4;
+		}
+		else if(type == 2)
+		{
+			try {
+				avatar = ImageIO.read(getClass().getResourceAsStream("/assets/SGTrigger.png"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			width = avatar.getWidth();
+			height = avatar.getHeight();
+		}
+		firing = false;
+	}
+
+
+	/* WHAT IT DOES: Draws the Trigger object
+	 * PARAMETERS: g2 - Graphics2D brush
+	 * RETURN: NONE*/
+	@Override
+	public void draw(Graphics2D g2) {
+		// TODO Auto-generated method stub
+		AffineTransform old = g2.getTransform();
+		update();
+		g2.translate((int)(posx), (int) (posy)-15);
+		g2.rotate(angle);
+		g2.drawImage(avatar, (int) -width/2, (int)-height/2+15, (int) width, (int) height, null);
+//		g2.setColor(Color.red);
+//		g2.fillOval(-5,-5,10,10);
+		g2.setTransform(old);
+	}
+	
+
+	/* WHAT IT DOES: animates the angle of the trigger when pulled. Updates constantly depending if the trigger is pulled
+	 * PARAMETERS: NONE
+	 * RETURN: NONE*/
+	private void update()
+	{
+		if (firing == true)
+		{
+			if (angle >= Math.toRadians(-35))
+			{
+//				double i = Math.toDegrees(angle);
+//				setAngle(i++);
+				angle-=0.5;
+			}
+			else
+			{
+				firing = false;
+				angle = 0;
+			}
+		}
+	}
+	
+
+	/* WHAT IT DOES: Getter method of firing status
+	 * PARAMETERS: NONE
+	 * RETURN: If the trigger is in firing animation*/
+	public boolean isFiring()
+	{
+		return firing;
+	}
+
+	/* WHAT IT DOES: Setter method of firing status
+	 * PARAMETERS: NONE
+	 * RETURN: Sets the trigger to firing status*/
+	public void fire()
+	{
+		firing = true;
+	}
+}

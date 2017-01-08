@@ -1,0 +1,69 @@
+package movingobjects;
+
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
+import sound.Sound;
+
+public abstract class Guns extends MovingObjects
+{
+	protected BufferedImage overlay; //Stores the overlay image of both rifles to cover part images
+	protected boolean gunLoaded; //Stores the status of whether the current gun is loaded
+	protected Bullet bullet; //Stores the placeholder bullet that the guns will use to display the bullet in their chamber
+	protected Sound fire; //The sound file to play when the gun has been fired
+	protected Sound click; //Sound file to play if the gun cannot fire, but trigger has been pulled
+	protected BufferedImage muzzleFlash; //The muzzle flash image to be displayed when the gun is fired
+	protected boolean flash; //Stores the status of whether or not to display the muzzleFlash, and when
+	protected Trigger trigger; //Stores the trigger object of the gun
+	protected double jerkTimer; //Stores how long the gun should be jerked back after firing
+
+	/* WHAT IT DOES: Constructor for the abstract class that provides code reuse for both guns
+	 * PARAMETERS: 
+	 * 	posx - x position to be drawn
+	 * 	posy - y position to be drawn
+	 * RETURN:*/
+	public Guns(double posx, double posy) {
+		super(posx, posy);
+		// TODO Auto-generated constructor stub
+		click = new Sound("click");
+		jerkTimer = 0;
+	}
+
+	/* WHAT IT DOES: Nothing, this is an inherited abstract class that has no real use in this secondary abstract class 
+	 * PARAMETERS:
+	 * 	g2 - brush of Graphics2D 
+	 * RETURN: NONE*/
+	@Override
+	public void draw(Graphics2D g2) {
+		// TODO Auto-generated method stub
+		
+	}
+	/* WHAT IT DOES: Handles ejection of shell for shotgun, and ejection of mag for rifle
+	 * PARAMETERS: NONE
+	 * RETURN: Whether the ejection was successful*/
+	abstract protected boolean eject();
+	
+	/* WHAT IT DOES: Handles the logistics of manual reloading via pumping the gun's pump to reload a shell
+	 * PARAMETERS: NONE
+	 * RETURN: NONE*/
+	abstract protected void manualReload();
+	
+	/* WHAT IT DOES: Handles the logistics of wasting the current chambered bullet due to unnecessary reload
+	 * PARAMETERS: NONE
+	 * RETURN: NONE*/
+	abstract protected void wasteBullet();
+	
+	/* WHAT IT DOES: Handles the logistics of determining when the inherited gun can fire
+	 * PARAMETERS: NONE
+	 * RETURN: Boolean - Whether this gun has successfully fired or not*/
+	abstract protected boolean fire();
+	
+	/* WHAT IT DOES: Handles the logistics of determining when this shot gun can fire
+	 * PARAMETERS: NONE
+	 * RETURN: Boolean - Whether this gun has successfully fired or not*/
+	public boolean isGunLoaded()
+	{
+		return gunLoaded;
+	}
+
+}

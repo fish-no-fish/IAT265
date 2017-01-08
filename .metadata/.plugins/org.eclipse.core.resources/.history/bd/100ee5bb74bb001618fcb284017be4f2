@@ -1,0 +1,146 @@
+package movingobjects;
+
+import java.awt.AlphaComposite;
+import java.awt.Composite;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+
+import sound.Sound;
+
+import static java.lang.Math.*;
+
+/* MOVINGOBJECTS class. The base class for all objects that move in this application. Provides basic
+ * 	object interactions and object movement
+ * CREATED: 11/10/2016
+ * AUTHOR: HENRY ZHAO*/
+public abstract class MovingObjects {
+	protected double posx; //x position
+	protected double posy; //y position
+	protected double width; //width of object
+	protected double height; //height of object
+	protected BufferedImage avatar; //base image to be displayed by the object
+	protected double angle; //angle to rotate the base image
+	
+	protected float initialOpacity; //initial opacity value when the object first appears
+	protected AlphaComposite opacity; //opacity object to be used via composite based on initialOpacity
+	protected AffineTransform old; //default old transformation to restore to
+	protected Composite oldC; //default old composite to restore to
+	protected double oldX, oldY; //The positions stored on the first mouse click during drag
+	
+	/* WHAT IT DOES: Default constructor for all movingobjects objects. Sets default positions and initial opacity
+	 * PARAMETERS:
+	 * 	posx - position x
+	 * 	posy - position y 
+	 * RETURN: NONE*/
+	public MovingObjects(double posx, double posy)
+	{
+		this.posx = posx;
+		this.posy = posy;
+		initialOpacity = 0;
+	}
+	
+	/* WHAT IT DOES: Handles and detects collisions between objects 
+	 * PARAMETERS: 
+	 * 	target - the other MovingObjects object that the calling object is colliding with
+	 * RETURN: Boolean - whether there was a collision*/
+	public boolean handleCollision(MovingObjects target)
+	{
+		if (Math.abs(posx - target.posx) <= width/2 + target.width/2 && Math.abs(posy - target.posy) <= height/2 + target.height/2)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	/* WHAT IT DOES: Handles fading in of images, where opacity is used 
+	 * PARAMETERS: NONE
+	 * RETURN: NONE*/
+	public void appear()
+	{
+		if (initialOpacity != 1)
+		{
+			initialOpacity += 0.05;
+		}
+		if (initialOpacity > 1)
+		{
+			initialOpacity = 1;
+		}
+	}
+	
+	/* WHAT IT DOES: Abstract draw method for various objects 
+	 * PARAMETERS: 
+	 * 	g2 - Graphics2D brush
+	 * RETURN: NONE*/
+	public abstract void draw(Graphics2D g2);
+	
+	public double dist(MovingObjects target)
+	{
+		return sqrt((abs(posx-target.posx)*abs(posx-target.posx))+
+				(abs(posy-target.posy)*abs(posy-target.posy)));
+	}
+	
+	public double distOfBox(Rectangle2D.Double box)
+	{
+		return sqrt((abs(posx-box.getX())*abs(posx-box.getX()))+
+				(abs(posy-box.getY())*abs(posy-box.getY())));
+	}
+	
+	public void setPos(double x, double y)
+	{
+		posx = x;
+		posy = y;
+	}
+	
+	public double getW()
+	{
+		return width;
+	}
+	public double getH()
+	{
+		return height;
+	}
+	
+	public double getX()
+	{
+		return posx;
+	}
+	
+	public double getY()
+	{
+		return posy;
+	}
+	public void setAngle(double theta)
+	{
+		angle = theta;
+	}
+
+	/**
+	 * @return the oldY
+	 */
+	public double getOldY() {
+		return oldY;
+	}
+
+	/**
+	 * @param oldY the oldY to set
+	 */
+	public void setOldY(double oldY) {
+		this.oldY = oldY;
+	}
+
+	/**
+	 * @return the oldX
+	 */
+	public double getOldX() {
+		return oldX;
+	}
+
+	/**
+	 * @param oldX the oldX to set
+	 */
+	public void setOldX(double oldX) {
+		this.oldX = oldX;
+	}
+}

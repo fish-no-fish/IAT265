@@ -1,0 +1,6 @@
+package factory;
+
+public class SoundConcreteFactory extends SoundFactory 
+{
+	
+}

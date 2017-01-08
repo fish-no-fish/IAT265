@@ -1,0 +1,86 @@
+package sound;
+
+import ddf.minim.*;
+import processing.core.PApplet;
+
+/* Sound class handles all sound related operations, including playing and importing logistics
+ * CREATED: 12/04/2016
+ * AUTHOR: HENRY ZHAO*/
+public class Sound 
+{
+	private Minim minim; //base minim object
+	private AudioPlayer song = null; //object to play loaded songs
+	private String theSong; //decision modifier of which song to create
+	private boolean canPlay; //records whether the song can be played, to prevent song looping when JAVA calls a function multiple times
+
+	/* WHAT IT DOES: Creates any song in the application
+	 * PARAMETERS: 
+	 * 	theSong - modifier for decision which song to create
+	 * RETURN: NONE*/
+	public Sound(String theSong)
+	{
+		minim = new Minim(new PApplet());
+		this.theSong = theSong;
+		canPlay = true;
+		switch (theSong)
+		{
+		case "SG1":
+			song = minim.loadFile("assets/shotgunCock1.wav");
+			break;
+		case "SG2":
+			song = minim.loadFile("assets/shotgunCock2.wav");
+			break;
+		case "ARFire":
+			song = minim.loadFile("assets/M4Fire.mp3");
+			break;
+		case "click":
+			song = minim.loadFile("assets/gunClick.mp3");
+			break;
+		case "clipIn":
+			song = minim.loadFile("assets/clipIn.mp3");
+			break;
+		case "clipOut":
+			song = minim.loadFile("assets/clipOut.mp3");
+			break;
+		case "chamberOut":
+			song = minim.loadFile("assets/ARChamberOut.mp3");
+			break;
+		case "chamberIn":
+			song = minim.loadFile("assets/ARChamberIn.mp3");
+			break;		
+		case "shell":
+			song = minim.loadFile("assets/shellFall.mp3");
+			break;
+		case "SGFire":
+			song = minim.loadFile("assets/SGBlast.mp3");
+			break;
+		default:
+			song = null;
+			break;
+		}
+		
+	}
+	
+	/* WHAT IT DOES: Convenient way to play each loaded song. Reduces code redundancy 
+	 * PARAMETERS: NONE
+	 * RETURN: NONE*/
+	public void play()
+	{
+		if (canPlay)
+		{
+			song.play();
+			song.rewind();
+			if (theSong == "SG1" || theSong == "SG2")
+				canPlay = false;
+		}
+	}
+	
+	/* WHAT IT DOES: Setter method for variable canPlay
+	 * PARAMETERS: 
+	 * 	var - desired variable to set canPlay to
+	 * RETURN: NONE*/
+	public void setPlay(boolean var)
+	{
+		canPlay = var;
+	}
+}
